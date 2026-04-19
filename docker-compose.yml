@@ -1,0 +1,45 @@
+x-relay-common: &relay-common
+  image: localrelay:latest
+  env_file:
+    - .env
+  volumes:
+    - ./data:/data
+    - ./certs:/certs:ro
+
+services:
+  app:
+    <<: *relay-common
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GOPROXY: ${GOPROXY:-https://goproxy.cn,direct}
+        GOSUMDB: ${GOSUMDB:-sum.golang.google.cn}
+        VERSION: ${VERSION:-dev}
+        COMMIT: ${COMMIT:-none}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
+    command: ["status"]
+    networks:
+      - 1panel-network
+
+  relay:
+    <<: *relay-common
+    pull_policy: never
+    command: ["serve"]
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:2525:2525"
+    healthcheck:
+      test: ["CMD", "relayctl", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      1panel-network:
+        ipv4_address: 172.18.0.3
+
+networks:
+  1panel-network:
+    external: true
+    name: 1panel-network
