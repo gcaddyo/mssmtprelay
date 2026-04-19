@@ -297,9 +297,3 @@ docker-compose run --rm app unbind
 - `ALLOW_HTML`
 - `ALLOW_INSECURE_AUTH`
 
-## 发行与合规
-
-- 项目许可证：`LICENSE`（MIT）
-- 第三方依赖许可证清单：`THIRD_PARTY_LICENSES.md`
-- 发行流程：`RELEASE.md`
-- 自动许可证审计脚本：`scripts/license_audit.sh`
